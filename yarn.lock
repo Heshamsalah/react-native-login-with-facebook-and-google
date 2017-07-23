@@ -4081,6 +4081,14 @@ react-native-drawer@^2.3.0:
   dependencies:
     tween-functions "^1.0.1"
 
+react-native-fbsdk@^0.6.1:
+  version "0.6.1"
+  resolved "https://registry.yarnpkg.com/react-native-fbsdk/-/react-native-fbsdk-0.6.1.tgz#268bdbda5a16f5341ca43e3fa1beb88801e35a92"
+
+react-native-google-signin@^0.10.0:
+  version "0.10.0"
+  resolved "https://registry.yarnpkg.com/react-native-google-signin/-/react-native-google-signin-0.10.0.tgz#cc47d3726165735ee61e3a4a589c2ced888f1a98"
+
 react-native-i18n@1.0.0:
   version "1.0.0"
   resolved "https://registry.yarnpkg.com/react-native-i18n/-/react-native-i18n-1.0.0.tgz#0c407d9ebb846aae1aa5e05de6503008553f02fd"
@@ -4254,7 +4262,7 @@ reactotron-core-client@^1.12.0:
     ramda "^0.24.1"
     ramdasauce "^2.0.0"
 
-reactotron-react-native@^1.12.0:
+reactotron-react-native@^1.12.1:
   version "1.12.1"
   resolved "https://registry.yarnpkg.com/reactotron-react-native/-/reactotron-react-native-1.12.1.tgz#7134169b184e2a82c8e223e4e4317d2a2ed91728"
   dependencies:

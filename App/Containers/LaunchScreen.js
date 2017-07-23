@@ -1,32 +1,118 @@
 import React, { Component } from 'react'
-import { ScrollView, Text, Image, View } from 'react-native'
+import { ScrollView, Text, Image, View, Button } from 'react-native'
 import DevscreensButton from '../../ignite/DevScreens/DevscreensButton.js'
-
+import {GoogleSignin, GoogleSigninButton} from 'react-native-google-signin'
 import { Images } from '../Themes'
+import Reactotron from 'reactotron-react-native'
+import { LoginButton, AccessToken } from 'react-native-fbsdk'
 
 // Styles
 import styles from './Styles/LaunchScreenStyles'
 
 export default class LaunchScreen extends Component {
+  constructor(props) {
+    super(props);
+    this.state = {
+      user: null
+    };
+  }
+
+  componentDidMount() {
+   this._setupGoogleSignin();
+  }
+
   render () {
-    return (
-      <View style={styles.mainContainer}>
-        <Image source={Images.background} style={styles.backgroundImage} resizeMode='stretch' />
-        <ScrollView style={styles.container}>
-          <View style={styles.centered}>
-            <Image source={Images.launch} style={styles.logo} />
+      if(!this.state.user){
+        return(
+          <View>
+            <GoogleSigninButton
+              style={{width: 312, height: 48}}
+              size={GoogleSigninButton.Size.Wide}
+              color={GoogleSigninButton.Color.Dark}
+              onPress={() => this._signIn() }/>
+
+            <LoginButton
+              publishPermissions={["publish_actions"]}
+              onLoginFinished={
+                (error, result) => {
+                  if (error) {
+                    alert("login has error: " + result.error);
+                  } else if (result.isCancelled) {
+                    alert("login is cancelled.");
+                  } else {
+                    AccessToken.getCurrentAccessToken().then(
+                      (data) => {
+                        alert(data.accessToken.toString())
+                        Reactotron.log(data);
+                      }
+                    )
+                  }
+                }
+              }
+              onLogoutFinished={() => alert("logout.")}/>
           </View>
 
-          <View style={styles.section} >
-            <Image source={Images.ready} />
-            <Text style={styles.sectionText}>
-              This probably isn't what your app is going to look like. Unless your designer handed you this screen and, in that case, congrats! You're ready to ship. For everyone else, this is where you'll see a live preview of your fully functioning app using Ignite.
-            </Text>
-          </View>
+        )
+      }
 
-          <DevscreensButton />
-        </ScrollView>
-      </View>
-    )
+      if(this.state.user){
+        return(
+          <View>
+            <Text> Signed in</Text>
+            <Button
+              title="Sign Out"
+              onPress={() => this._signOut()}>
+              <Text>Sign out</Text>
+            </Button>
+            <Button
+              title="Get token"
+              onPress={() => this._getUserToken()}>
+              <Text>Token</Text>
+            </Button>
+            <Text> {this.state.user.accessToken} </Text>
+          </View>
+        )
+      }
+  }
+
+  async _setupGoogleSignin() {
+    try {
+      await GoogleSignin.hasPlayServices({ autoResolve: true });
+      await GoogleSignin.configure({
+        //webClientId: <FROM DEVELOPER CONSOLE>, // client ID of type WEB for your server (needed to verify user ID and offline access)
+        offlineAccess: false
+      });
+
+      const user = await GoogleSignin.currentUserAsync();
+      Reactotron.log(user);
+      this.setState({user});
+    }
+    catch(err) {
+      console.log("Play services error", err.code, err.message);
+    }
+  }
+
+  _getUserToken(){
+    const user = GoogleSignin.currentUser();
+    Reactotron.log(user);
+  }
+
+  _signIn() {
+    GoogleSignin.signIn()
+    .then((user) => {
+      Reactotron.log(user);
+      this.setState({user: user});
+    })
+    .catch((err) => {
+      console.log('WRONG SIGNIN', err);
+    })
+    .done();
+  }
+
+  _signOut() {
+    GoogleSignin.revokeAccess().then(() => GoogleSignin.signOut()).then(() => {
+      this.setState({user: null});
+    })
+    .done();
   }
 }
